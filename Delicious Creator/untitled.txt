@@ -1,0 +1,41 @@
+key requestId;
+
+default
+{
+    state_entry()
+    {
+        llSay(0, "created");
+    }
+
+    touch_start(integer total_number)
+    {
+        llSay(0, "Touched.");
+        llLoadURL(llDetectedKey(0), "Flame on!", "http://forums.secondlife.com");
+        requestId = llHTTPRequest("http://www.mydomain.de/delicious.txt",[HTTP_METHOD,"GET"],"");
+    }
+    
+    http_response(key request_id, integer status, list metadata, string body) {
+        integer i;
+        if (request_id == requestId)
+        {
+            //llSay(0, body);
+            list resultList = llParseString2List(body,["|"],[]);
+            integer listlength = llGetListLength(resultList);
+            for(i=0;i<listlength;i+=2) {
+                llSetText(llList2String(resultList, i+1), <0,0,.5>, 1.0);
+            }     
+        
+        } else
+            llSay(0,(string)status+" error");
+    }    
+    
+    on_rez(integer start_param) {
+        if (start_param != 0) {
+            llSetTimerEvent(10.0);
+        } 
+    }
+
+    timer() {
+        llDie(); 
+    }    
+}
